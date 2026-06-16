@@ -212,7 +212,7 @@ lark-cli im +messages-send --chat-id oc_xxx --markdown $'## Test\n\nhello' --dry
 | `media` | `{"file_key":"file_xxx","image_key":"img_xxx"}` (video; `image_key` is the cover from `--video-cover` — **required**) |
 | `share_chat` | `{"chat_id":"oc_xxx"}` |
 | `share_user` | `{"user_id":"ou_xxx"}` |
-| `interactive` | Card JSON (see Feishu interactive card documentation) |
+| `interactive` | Card JSON — see [`card/lark-im-card-create.md`](card/lark-im-card-create.md) for the full workflow (it routes to schema/style/component references as needed) |
 
 ## Return Value
 
