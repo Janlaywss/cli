@@ -158,6 +158,28 @@ lark-cli im +messages-send --chat-id oc_xxx --text "Hello" --idempotency-key my-
 
 # Preview the request without executing it
 lark-cli im +messages-send --chat-id oc_xxx --markdown $'## Test\n\nhello' --dry-run
+
+# ===== Interactive Card =====
+
+# Send a Card 2.0 notification with a button
+lark-cli im +messages-send --chat-id oc_xxx --msg-type interactive --content '{
+  "schema": "2.0",
+  "header": {
+    "title": {"tag": "plain_text", "content": "Deploy Notice"},
+    "template": "green"
+  },
+  "body": {
+    "elements": [
+      {"tag": "markdown", "content": "**Project**: User Center v2.0\n**Time**: 2026-06-23 10:00\n**Owner**: Zhang San"},
+      {"tag": "hr"},
+      {"tag": "markdown", "content": "All checks passed. Production release complete."},
+      {"tag": "button", "text": {"tag": "plain_text", "content": "View Details"}, "type": "primary", "behaviors": [{"type": "open_url", "default_url": "https://example.com"}]}
+    ]
+  }
+}'
+
+# For larger card JSON, write to a file and pass with @file
+lark-cli im +messages-send --chat-id oc_xxx --msg-type interactive --content @card.json
 ```
 
 ## Media Input Rules
@@ -214,6 +236,8 @@ lark-cli im +messages-send --chat-id oc_xxx --markdown $'## Test\n\nhello' --dry
 | `share_user` | `{"user_id":"ou_xxx"}` |
 | `interactive` | Card JSON — see [`card/lark-im-card-create.md`](card/lark-im-card-create.md) for the full workflow (it routes to schema/style/component references as needed) |
 
+> **`post` vs `interactive`:** `post` is a static rich-text message (title, paragraphs, @mentions, links, inline images) — content is fixed once sent. `interactive` is a card with structured layout and UI components (buttons, forms, selects, date pickers, charts) — content can be updated after sending and supports user-action callbacks. Use `post` for read-only content; use `interactive` when the message needs user interaction or dynamic updates.
+
 ## Return Value
 
 ```json
@@ -262,3 +286,4 @@ Card content is **not** normalized — use the card-native `<at>` syntax inside 
 - `--as bot` uses a tenant access token (TAT) and requires the `im:message:send_as_bot` scope
 - When sending as a bot, the app must already be in the target group or already have a direct-message relationship with the target user
 - When using `--markdown` with images, pre-uploading via `images.create` to obtain an `image_key` is recommended for reliability; remote URLs may be auto-resolved at runtime, but if download/upload fails the image is removed with a warning; local paths are not supported
+- When sending an interactive card, construct the card JSON via [`card/lark-im-card-create.md`](card/lark-im-card-create.md) workflow (Step 1→4), then send with `--msg-type interactive --content '<card_json>'`
